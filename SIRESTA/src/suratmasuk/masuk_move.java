@@ -38,7 +38,7 @@ public class masuk_move extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        dateChooser2 = new com.raven.datechooser.DateChooser();
+        dateChooser3 = new com.raven.datechooser.DateChooser();
         txtkegiatan = new javax.swing.JTextField();
         txttanggal = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -48,7 +48,8 @@ public class masuk_move extends javax.swing.JFrame {
         btnsave = new javax.swing.JButton();
         txtwaktu = new com.github.lgooddatepicker.components.TimePicker();
 
-        dateChooser2.setTextRefernce(txttanggal);
+        dateChooser3.setDateFormat("yyyy-MM-dd");
+        dateChooser3.setTextRefernce(txttanggal);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -80,15 +81,23 @@ public class masuk_move extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnsaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsaveActionPerformed
+                                       
     String kegiatan = txtkegiatan.getText();
     String tanggal = txttanggal.getText();
     String waktu = txtwaktu.getText();
     String direktori = txtdirektori.getText();
-    try{
+    try {
         Statement statement = (Statement) conek.GetConnection().createStatement();
-        statement.executeUpdate("INSERT INTO kegiatan (date, kegiatan, surat, waktu) VALUES ('"+tanggal+"','"+kegiatan+"','"+direktori+"','"+waktu+"')");
-    } catch (Exception e){
-        JOptionPane.showMessageDialog(null, e);
+        // Perintah SQL untuk memasukkan data ke dalam tabel kegiatan
+        String sql = "INSERT INTO kegiatan (date, kegiatan, surat, waktu) VALUES "
+                + "('" + tanggal + "','" + kegiatan + "','" + direktori + "','" + waktu + "')";
+        // Jalankan perintah SQL
+        statement.executeUpdate(sql);
+        // Beri pesan bahwa data telah disimpan
+        JOptionPane.showMessageDialog(null, "Data berhasil disimpan");
+    } catch (Exception e) {
+        // Tangani jika terjadi kesalahan
+        JOptionPane.showMessageDialog(null, "Gagal menyimpan data: " + e.getMessage());
     }
     }//GEN-LAST:event_btnsaveActionPerformed
 
@@ -129,7 +138,7 @@ public class masuk_move extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnsave;
-    private com.raven.datechooser.DateChooser dateChooser2;
+    private com.raven.datechooser.DateChooser dateChooser3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

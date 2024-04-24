@@ -45,22 +45,20 @@ public class kegiatan extends javax.swing.JFrame {
         DefaultTableModel tbl=new DefaultTableModel();
         tbl.addColumn("date");  
         tbl.addColumn("kegiatan");
-        
-        tbl.addColumn("waktu");
         tbl.addColumn("surat");
+        tbl.addColumn("waktu");
        
         table.setModel(tbl);
         try{
             Statement statement=(Statement)conek.GetConnection().createStatement();
-            ResultSet res=statement.executeQuery("SELECT * from kegiatan ORDER BY date ASC");
+            ResultSet res=statement.executeQuery("SELECT * from kegiatan ");
             while(res.next())
             {
                 tbl.addRow(new Object[]{
                     res.getString("date"),
                     res.getString("kegiatan"),
-                    
-                    res.getString("waktu"),
                     res.getString("Surat"),
+                    res.getString("waktu")
                     
             });
                 table.setModel(tbl);
@@ -86,7 +84,6 @@ public class kegiatan extends javax.swing.JFrame {
 
         dateChooser3 = new com.raven.datechooser.DateChooser();
         txttgl = new javax.swing.JTextField();
-        txtwaktu = new javax.swing.JTextField();
         txtkegiatan = new javax.swing.JTextField();
         badd = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -96,8 +93,10 @@ public class kegiatan extends javax.swing.JFrame {
         bdelete = new javax.swing.JLabel();
         bedit = new javax.swing.JLabel();
         txtsurat = new javax.swing.JTextField();
+        txtwaktu = new com.github.lgooddatepicker.components.TimePicker();
         cover = new javax.swing.JLabel();
 
+        dateChooser3.setDateFormat("yyyy-MM-dd");
         dateChooser3.setTextRefernce(txttgl);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -110,7 +109,6 @@ public class kegiatan extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txttgl, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, 170, -1));
-        getContentPane().add(txtwaktu, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 340, 170, -1));
         getContentPane().add(txtkegiatan, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 260, 170, -1));
 
         badd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -154,7 +152,7 @@ public class kegiatan extends javax.swing.JFrame {
                 tglcariActionPerformed(evt);
             }
         });
-        getContentPane().add(tglcari, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 150, 240, 30));
+        getContentPane().add(tglcari, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 150, 290, 30));
 
         bsearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bsearch.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -180,6 +178,7 @@ public class kegiatan extends javax.swing.JFrame {
         });
         getContentPane().add(bedit, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, 250, 30, 30));
         getContentPane().add(txtsurat, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 400, 170, -1));
+        getContentPane().add(txtwaktu, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 340, 160, -1));
 
         cover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ui/KEGIATAN nw.png"))); // NOI18N
         getContentPane().add(cover, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 1239, 670));
@@ -192,13 +191,13 @@ public class kegiatan extends javax.swing.JFrame {
         // TODO add your handling code here:
           {                                        
         String kegiatan = txtkegiatan.getText();
-        String date = txttgl.getText();
+        String tanggal = txttgl.getText();
         String waktu = txtwaktu.getText();
         String surat = txtsurat.getText();
           try{
               Statement statement = (Statement) conek.GetConnection().createStatement();
-              statement.executeUpdate("insert into kegiatan VALUES ('" 
-                      + kegiatan + "','" + date + "', '" + waktu + "', '"+surat+"')");
+              statement.executeUpdate("INSERT INTO kegiatan (date, kegiatan, surat, waktu) VALUES ('" 
+                      + tanggal + "','" + kegiatan + "', '" + surat + "', '"+waktu+"')");
               datatable();
               reset();
           } catch (Exception e) {
@@ -208,32 +207,42 @@ public class kegiatan extends javax.swing.JFrame {
     }//GEN-LAST:event_baddMouseClicked
 
     private void bsearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bsearchMouseClicked
-        // TODO add your handling code here:
-        try{
-            Statement statement = (Statement) conek.GetConnection().createStatement();
-            ResultSet res = statement.executeQuery("select * from kegiatan where "
-                    + "date='" + tglcari.getText() + "'");
-            DefaultTableModel tbl = new DefaultTableModel();
-            tbl.addColumn("kegiatan");
-            tbl.addColumn("date");
-            tbl.addColumn("waktu");
-            tbl.addColumn("surat");
-            
-            table.setModel(tbl);
-            
-            while (res.next()) {
-                tbl.addRow(new Object[]{
-                        res.getString("kegiatan"),
-                        res.getString("date"),
-                        res.getString("waktu"),
-                        res.getString("surat"),
-                });
+            try {
+                Statement statement = (Statement) conek.GetConnection().createStatement();
+                ResultSet res = statement.executeQuery("SELECT * FROM kegiatan WHERE nomor LIKE '%" + tglcari.getText() + "%' "
+                    + "OR date LIKE '%" + tglcari.getText() + "%' "
+                    + "OR kegiatan LIKE '%" + tglcari.getText() + "%' "
+                    + "OR surat LIKE '%" + tglcari.getText() + "%' "
+                    + "OR waktu LIKE '%" + tglcari.getText() + "%' " );
+
+                DefaultTableModel tbl = new DefaultTableModel();
+                tbl.addColumn("date");
+                tbl.addColumn("kegiatan");
+                tbl.addColumn("surat");
+                tbl.addColumn("waktu");
+
+
+                boolean found = false; // Menandai apakah hasil pencarian ditemukan atau tidak
+                while (res.next()) {
+                    tbl.addRow(new Object[]{
+                            res.getString("date"),
+                            res.getString("kegiatan"),
+                            res.getString("surat"),
+                            res.getString("waktu")
+                    });
+                    found = true; // Setel ke true jika setidaknya satu hasil pencarian ditemukan
+                }
+
                 table.setModel(tbl);
-            }
+
+                    // Jika hasil pencarian tidak ditemukan, kosongkan tabel
+                    if (!found) {
+                        tbl.setRowCount(0); // Menghapus semua baris dari tabel
+                    }
+
         }catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, "salah");
+
         }
-        
     }//GEN-LAST:event_bsearchMouseClicked
 
     private void bdeleteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bdeleteMouseClicked
@@ -241,6 +250,7 @@ public class kegiatan extends javax.swing.JFrame {
         String kegiatan = txtkegiatan.getText();
         String Date = txttgl.getText();
         String waktu = txtwaktu.getText();
+        String surat = txtsurat.getText();
         
         
         try{
@@ -290,13 +300,14 @@ public class kegiatan extends javax.swing.JFrame {
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
         // TODO add your handling code here:
         int baris = table.rowAtPoint(evt.getPoint());
-        String nip = table.getValueAt(baris, 0).toString();
-        txttgl.setText(nip);
+        String tgl = table.getValueAt(baris, 0).toString();
+        txttgl.setText(tgl);
         String nama = table.getValueAt(baris , 1).toString();
         txtkegiatan.setText(nama);
-        String jabatan = table.getValueAt(baris , 2).toString();
-        txtwaktu.setText(jabatan);
-        String surat = table.getValueAt(baris,3).toString();
+        String waktu = table.getValueAt(baris , 3).toString();
+        txtwaktu.setText(waktu);
+        String surat = table.getValueAt(baris,2).toString();
+        txtsurat.setText(surat);
         
     }//GEN-LAST:event_tableMouseClicked
 
@@ -354,7 +365,7 @@ public class kegiatan extends javax.swing.JFrame {
     private javax.swing.JTextField txtkegiatan;
     private javax.swing.JTextField txtsurat;
     private javax.swing.JTextField txttgl;
-    private javax.swing.JTextField txtwaktu;
+    private com.github.lgooddatepicker.components.TimePicker txtwaktu;
     // End of variables declaration//GEN-END:variables
 
 }
